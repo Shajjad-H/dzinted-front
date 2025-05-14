@@ -1,12 +1,12 @@
 import { View, Text } from 'react-native'
 import React from 'react'
 
-const SignInForm = () => {
+const testhooks = () => {
   return (
     <View>
-      <Text>SignInForm test</Text>
+      <Text>testhooks</Text>
     </View>
   )
 }
 
-export default SignInForm
+export default testhooks
