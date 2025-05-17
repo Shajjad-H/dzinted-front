@@ -1,11 +1,32 @@
-import { View, Text, TouchableOpacity, } from 'react-native';
+
+import { View, Text, TouchableOpacity } from 'react-native';
 import React from 'react';
 import { Input, InputField } from '@/components/ui/input';
 import LogoGoogle from "@/assets/Google-Icon--Streamline-Svg-Logos.svg"
 import LogoMarque from "@/assets/Globe-Showing-Europe-Africa--Streamline-Emoji.svg"
 import { router } from 'expo-router';
+import { useForm, Controller } from "react-hook-form";
+import { zodResolver } from "@hookform/resolvers/zod";
+import { SchemaInscription } from '@/schema/SchemaInscription';
+import { z } from 'zod';
+
+type SchemaInscriptionType = z.infer<typeof SchemaInscription>;
 
 const Inscription = () => {
+    const { control, handleSubmit, reset, formState: { errors, isSubmitting }} = useForm<SchemaInscriptionType>({ 
+      resolver: zodResolver(SchemaInscription), 
+      defaultValues : {
+        email : "hocine@mail.com"
+      }
+    });
+
+    const SubmitForm = (data: SchemaInscriptionType) => {
+      console.log("Données du formulaire:", data);
+      // Ici on va consommer l'api 
+      reset() // Ici c'est pour reset le formulaire 
+      // router.push("/connexion") a rediriger si la réponse de l'api est bonne 
+    }
+    
   return (
     <View className="flex-1 bg-white p-6 mt-16">
    
@@ -21,44 +42,92 @@ const Inscription = () => {
       
         <View>
           <Text className="text-sm font-medium text-gray-700 mb-1">Pseudo</Text>
-          <Input
-            variant="outline"
-            size="lg"
-            className="bg-gray-50 border border-gray-300 rounded-lg"
-          >
-            <InputField placeholder="Votre pseudo" />
-          </Input>
+          <Controller
+            control={control}
+            name="pseudo"
+            render={({ field: { onChange, onBlur, value } }) => (
+              <Input
+                variant="outline"
+                size="lg"
+                className="bg-gray-50 border border-gray-300 rounded-lg"
+              
+              >
+                <InputField 
+                  placeholder="Votre pseudo" 
+                  onChangeText={onChange}
+                  onBlur={onBlur}
+                  value={value}
+                />
+              </Input>
+            )}
+          />
+          {errors.pseudo && (
+            <Text className="text-red-500 text-md mt-1">{errors.pseudo.message}</Text>
+          )}
         </View>
-
 
         <View>
           <Text className="text-sm font-medium text-gray-700 mb-1">Email</Text>
-          <Input
-            variant="outline"
-            size="lg"
-            className="bg-gray-50 border border-gray-300 rounded-lg"
-          >
-            <InputField placeholder="votre@email.com" keyboardType="email-address" />
-          </Input>
+          <Controller
+            control={control}
+            name="email"
+            render={({ field: { onChange, onBlur, value } }) => (
+              <Input
+                variant="outline"
+                size="lg"
+                className="bg-gray-50 border border-gray-300 rounded-lg"
+               
+              >
+                <InputField 
+                  placeholder="votre@email.com" 
+                  keyboardType="email-address"
+                  onChangeText={onChange}
+                  onBlur={onBlur}
+                  value={value}
+                />
+              </Input>
+            )}
+          />
+          {errors.email && (
+            <Text className="text-red-500 text-md mt-1">{errors.email.message}</Text>
+          )}
         </View>
 
         <View>
           <Text className="text-sm font-medium text-gray-700 mb-1">Mot de passe</Text>
-          <Input
-            variant="outline"
-            size="lg"
-            className="bg-gray-50 border border-gray-300 rounded-lg"
-          >
-            <InputField placeholder="••••••••" secureTextEntry={true} />
-          </Input>
+          <Controller
+            control={control}
+            name="password"
+            render={({ field: { onChange, onBlur, value } }) => (
+              <Input
+                variant="outline"
+                size="lg"
+                className="bg-gray-50 border border-gray-300 rounded-lg"
+               
+              >
+                <InputField 
+                  placeholder="••••••••" 
+                  secureTextEntry={true}
+                  onChangeText={onChange}
+                  onBlur={onBlur}
+                  value={value}
+                />
+              </Input>
+            )}
+          />
+          {errors.password && (
+            <Text className="text-red-500 text-md mt-1">{errors.password.message}</Text>
+          )}
         </View>
-
     
         <TouchableOpacity 
-          className="bg-blue-600 py-3 rounded-lg mt-4"
-          onPress={() => router.push("/connexion")}
+          className={`${isSubmitting ? 'bg-blue-400' : 'bg-blue-600'} py-3 rounded-lg mt-4`}
+          onPress={handleSubmit(SubmitForm)}
+          disabled={isSubmitting}
         >
-          <Text className="text-white text-lg font-semibold text-center">Inscription</Text>
+          <Text className="text-white text-lg font-semibold text-center">
+            {isSubmitting ? 'Inscription en cours...' : 'Inscription'}
+          </Text>
         </TouchableOpacity>
 
         <View className="flex-row items-center justify-center my-4">

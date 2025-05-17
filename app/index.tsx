@@ -40,7 +40,7 @@ export default function Index() {
           className="bg-green-500 px-16 py-4 rounded-2xl  flex-row items-center shadow-lg"
           onPress={() => {
             login();
-            router.push("/accueil");
+            router.push("/connexion");
           }}
         >
           <LogIn color="white" size={24} style={{ marginRight: 8 }} />

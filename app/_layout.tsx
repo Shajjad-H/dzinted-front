@@ -5,9 +5,9 @@ import "../global.css";
 
 const Layout = () => {
   return (
-
     // Layout globale de l'app ou on ajoute le Provider pour respecter l'espacement selon les différents type de téléphone 
     // Stack permet de revenir en arrière avec les pages tout betement
+    
     <SafeAreaProvider>
       <Stack screenOptions={{headerShown : false}}>
         <Stack.Screen
