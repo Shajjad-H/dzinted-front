@@ -15,7 +15,7 @@ const Layout = () => {
           options={{ title: "Accueil", headerShown: false }}
         />
         <Stack.Screen
-          name="signinform"
+          name="inscription"
           options={{ title: "Inscription" }}
         />
       </Stack>

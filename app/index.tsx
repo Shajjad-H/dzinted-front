@@ -23,9 +23,21 @@ export default function Index() {
 
       <ShoppingIllustration height={450} width={450} />
 
-      <View className="mt-5">
+      <View className="mt-5 flex gap-5">
+      
         <TouchableOpacity
-          className="bg-green-500 px-16 py-4 rounded-xl mb-4 flex-row items-center shadow-lg"
+          className="bg-green-500 px-16 py-4 rounded-2xl flex-row items-center shadow-lg"
+          onPress={() => {
+            // login();
+            router.push("/inscription");
+          }}
+        >
+          <UserPlus color="white" size={24} style={{ marginRight: 8 }} />
+          <Text className="text-white font-bold text-xl">Inscription</Text>
+        </TouchableOpacity>
+
+          <TouchableOpacity
+          className="bg-green-500 px-16 py-4 rounded-2xl  flex-row items-center shadow-lg"
           onPress={() => {
             login();
             router.push("/accueil");
@@ -33,16 +45,6 @@ export default function Index() {
         >
           <LogIn color="white" size={24} style={{ marginRight: 8 }} />
           <Text className="text-white font-bold text-xl">Connexion</Text>
-        </TouchableOpacity>
-        <TouchableOpacity
-          className="bg-green-500 px-16 py-4 rounded-lg flex-row items-center shadow-lg"
-          onPress={() => {
-            login();
-            router.push("/accueil");
-          }}
-        >
-          <UserPlus color="white" size={24} style={{ marginRight: 8 }} />
-          <Text className="text-white font-bold text-xl">Inscription</Text>
         </TouchableOpacity>
       </View>
     </View>

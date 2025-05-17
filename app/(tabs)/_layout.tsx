@@ -4,7 +4,9 @@ import {
   Search,
   User,
   MessageCircle,
-  ShoppingBag,
+
+  PackagePlus,
+  UserRound,
 } from "lucide-react-native";
 import React from "react";
 import colors from "@/utils/colors";
@@ -22,6 +24,7 @@ export default function LayoutTabs() {
         name="accueil"
         options={{
           tabBarIcon: ({ size, color }) => <House color={color} size={size} />,
+          title:"Accueil"
         }}
       />
       <Tabs.Screen
@@ -32,11 +35,13 @@ export default function LayoutTabs() {
         }}
       />
 
+
+
       <Tabs.Screen
         name="vendre"
         options={{
           tabBarIcon: ({ size, color }) => (
-            <ShoppingBag color={color} size={size} />
+            <PackagePlus color={color} size={size} />
           ),
           title: "Vendre",
         }}
@@ -56,7 +61,7 @@ export default function LayoutTabs() {
         name="profil"
         options={{
           tabBarIcon: ({ size, color }) => (
-            <User color={color} size={size} />
+            <UserRound color={color} size={size} />
           ),
           title: "Profil",
         }}
