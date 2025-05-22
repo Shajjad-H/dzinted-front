@@ -1,6 +1,6 @@
 import React, { createContext, useContext, useEffect, useState, ReactNode } from 'react';
 import axios from 'axios';
-import api from '../configs/api';
+import api from '../configs/api_configs';
 
 interface AuthContextType {
   user: any | null;
