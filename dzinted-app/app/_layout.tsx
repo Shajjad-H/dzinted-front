@@ -24,7 +24,7 @@ function Layout() {
 
     useEffect(() => {
         if (!user && !loading) {
-            router.push('/auth/login');
+            router.replace('/auth/login');
         }
     }, [user, router, loading]);
 

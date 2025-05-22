@@ -1,6 +1,7 @@
 import React, { createContext, useContext, useEffect, useState, ReactNode } from 'react';
 import axios from 'axios';
 import api from '../configs/api_configs';
+import api_client from '../api/client';
 
 interface AuthContextType {
   user: any | null;
@@ -21,7 +22,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   const fetchUser = async () => {
     try {
       setLoading(true);
-      const res = await axios.get(`${api.base_url}/user/me`);
+      const res = await api_client.get(`${api.base_url}/user/me`);
       setUser(res.data);
       setError(null);
     } catch (err: any) {

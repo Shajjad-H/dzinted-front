@@ -9,7 +9,7 @@ export default function AuthLayout() {
     const {user} = useAuth();
 
     useEffect(() => {
-        if (user) {
+        if (!!user) {
             router.push('/');
         }
     }, [user, router]);

@@ -21,6 +21,7 @@ api_client.interceptors.request.use(
     async (config: any): Promise<any> => {
         // Assuming getAccessToken() returns a Promise<string | null | undefined>
         const token = await getAccessToken();
+
         if (token) {
             config.headers = {
                 ...config.headers, // Preserve existing headers
@@ -30,7 +31,6 @@ api_client.interceptors.request.use(
         return config;
     },
     (error) => {
-        // Optional: Handle request errors here
         return Promise.reject(error);
     }
 
@@ -63,7 +63,6 @@ api_client.interceptors.response.use(
                     `${api_config.base_url}/auth/refresh/access-token`,
                     { refresh_token: refreshToken }
                 );
-
                 const { access_token, refresh_token } = res.data;
 
                 await setTokens(access_token, refresh_token);
@@ -75,9 +74,13 @@ api_client.interceptors.response.use(
 
             } catch (err) {
                 processQueue(err, null);
-                
-                // log out user
-                await clearTokens();
+
+                if (error.response?.status === 403) { // forbidden from server jwt expired
+                    // log out user
+                    await clearTokens();
+                } else if (!error.response && error.message && error.message.includes('Network Error')) {
+                    // Handle network error (no response from server)
+                }
                 return Promise.reject(err);
             } finally {
                 isRefreshing = false;
