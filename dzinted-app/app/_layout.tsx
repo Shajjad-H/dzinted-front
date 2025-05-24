@@ -4,36 +4,38 @@ import MobileNavbar from '../components/mobile/MobileNavbar';
 import WebNavbar from '../components/web/WebNavbar';
 import { useEffect } from 'react';
 import { AuthProvider, useAuth } from '../contexts/AuthContext';
+import { SafeAreaProvider } from 'react-native-safe-area-context';
 
 
 export default function RootLayout() {
     return (
+        <SafeAreaProvider>
     <AuthProvider>
         <Layout />
     </AuthProvider>
+    </SafeAreaProvider>
     )
 }
-
 
 
 function Layout() {
 
     const router = useRouter();
 
-    const { user, error, loading } = useAuth();
+    // const { user, error, loading } = useAuth();
 
-    useEffect(() => {
-        if (!user && !loading) {
-            router.replace('/auth/login');
-        }
-    }, [user, router, loading]);
+    // useEffect(() => {
+    //     if (!user && !loading) {
+    //         router.replace('/auth/login');
+    //     }
+    // }, [user, router, loading]);
 
 
-    if (loading) {
-        return (<View><Text>Loading...</Text></View>);
-    }
+    // if (loading) {
+    //     return (<View><Text>Loading...</Text></View>);
+    // }
 
-    if (!user) return <Slot />;
+    // if (!user) return <Slot />;
 
 
     const isWeb = Platform.OS === 'web';
@@ -41,10 +43,12 @@ function Layout() {
 
     return (
         <>
+       
             <View className='h-[95vh] pt-10'>
                 {isWeb ? <WebNavbar /> : <MobileNavbar onWeb={false} />}
                 <Slot />
             </View>
+          
         </>
     );
 }

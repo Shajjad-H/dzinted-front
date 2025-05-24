@@ -1,46 +1,120 @@
-import { Button, Pressable, Text, TextInput, View } from "react-native";
-import { useAuth } from "../../contexts/AuthContext";
-import { useState } from "react";
+import React from "react";
+import {
+  View,
+  Text,
+  TextInput,
+  TouchableOpacity,
+  Platform,
+} from "react-native";
+import { useForm, Controller } from "react-hook-form";
+import { zodResolver } from "@hookform/resolvers/zod";
+import { z } from "zod";
 import { useRouter } from "expo-router";
+import { SchemaLogin } from "../../schema/SchemaLogin";
 
+type SchemaLoginType = z.infer<typeof SchemaLogin>;
 
+const LoginPage = () => {
+  const router = useRouter();
 
-function LoginPage() {
-    const [email, setEmail] = useState('');
-    const router = useRouter();
+  const {
+    control,
+    handleSubmit,
+    reset,
+    formState: { errors, isSubmitting },
+  } = useForm<SchemaLoginType>({
+    defaultValues: {
+      email: "",
+    },
+    resolver: zodResolver(SchemaLogin),
+  });
 
-    function handleRequestCode() {
-        // TODO: call api
-        router.push('/auth/request-code?email='+email);
-    }
+  function handleRequestCode(data: SchemaLoginType) {
+    // TODO: call api
+    // router.push("/auth/request-code?email=" + data.email);
+    console.log(data);
+    reset();
+  }
 
-    return (
-        <View className="flex-1 justify-center items-center bg-gray-100 p-6">
-            <View className="bg-white rounded-xl shadow-lg p-8 w-full max-w-md">
-                <Text className="text-xl font-semibold mb-4 text-gray-800 text-center">Login</Text>
-                <View className="mb-4">
-                    <Text className="text-gray-700 mb-2">Email:</Text>
-                    <TextInput
-                        value={email}
-                        onChangeText={setEmail}
-                        className="border border-gray-300 rounded-md py-3 px-2 text-gray-700 focus:outline-none focus:border-blue-500"
-                        placeholder="Your email"
-                        keyboardType="email-address"
-                    />
-                </View>
-                
-                <Pressable onPress={handleRequestCode}  className="bg-blue-600 hover:bg-blue-700 active:bg-blue-700 rounded-md py-4">
-                    <Text className="text-white font-semibold text-center">Login</Text>
-                </Pressable>
+  // Styles responsive
+  const inputClass =
+    Platform.OS === "web"
+      ? "border border-gray-300 rounded-lg px-4 py-3 text-lg bg-gray-50 focus:border-blue-500 outline-none placeholder:text-gray-400"
+      : "border border-gray-300 rounded-lg px-3 py-2 text-base bg-gray-50";
 
-                <View className="flex flex-row justify-center mt-10">
-                    <Pressable onPress={() => router.push('/auth/register')}>
-                        <Text className="text-blue-400">register</Text>
-                    </Pressable>
-                </View>
-            </View>
+  const labelClass =
+    Platform.OS === "web"
+      ? "text-base font-medium text-gray-700 mb-1"
+      : "text-sm font-medium text-gray-700 mb-1";
+
+  return (
+    <View className="flex-1 bg-white p-6 mt-16 items-center">
+      <View
+        style={
+          Platform.OS === "web"
+            ? { width: "50%", minWidth: 320, maxWidth: 500 }
+            : { width: "100%" }
+        }
+        className="w-full"
+      >
+        <Text className="text-3xl font-bold text-center text-gray-800 mb-8">
+          Connexion
+        </Text>
+
+        <View className="flex gap-4">
+          {/* Email */}
+          <View>
+            <Text className={labelClass}>Email</Text>
+            <Controller
+              control={control}
+              name="email"
+              render={({ field: { onChange, onBlur, value } }) => (
+                <TextInput
+                  className={inputClass}
+                  placeholder="votre@email.com"
+                  keyboardType="email-address"
+                  autoCapitalize="none"
+                  onChangeText={onChange}
+                  onBlur={onBlur}
+                  value={value}
+                  textContentType="emailAddress"
+                  autoCorrect={false}
+                />
+              )}
+            />
+            {errors.email && (
+              <Text className="text-red-500 text-md mt-1">
+                {errors.email.message}
+              </Text>
+            )}
+          </View>
+
+          {/* Bouton connexion */}
+          <TouchableOpacity
+            className={`${
+              isSubmitting ? "bg-blue-400" : "bg-blue-600"
+            } py-3 rounded-lg mt-4`}
+            onPress={handleSubmit(handleRequestCode)}
+            disabled={isSubmitting}
+          >
+            <Text className="text-white text-lg font-semibold text-center">
+              {isSubmitting ? "Connexion en cours..." : "Se connecter"}
+            </Text>
+          </TouchableOpacity>
+
+          {/* Lien vers inscription */}
+          <View className="flex-row justify-center mt-6">
+            <Text className="text-gray-600">Pas encore de compte ?</Text>
+            <TouchableOpacity onPress={() => router.push("/auth/register")}>
+              <Text className="text-blue-600 font-medium ml-1">
+                S'inscrire
+              </Text>
+            </TouchableOpacity>
+          </View>
         </View>
-    );
-}
+      </View>
+    </View>
+  );
+};
 
 export default LoginPage;

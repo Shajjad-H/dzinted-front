@@ -1,108 +1,167 @@
-import { Button, Pressable, Text, TextInput, View } from "react-native";
-import { useAuth } from "../../contexts/AuthContext";
-import { useState } from "react";
-import { useRouter } from "expo-router";
-import api_client from "../../api/client";
-import api_configs from "../../configs/api_configs";
-import { AxiosError } from "axios";
+import React from "react";
+import {
+  View,
+  Text,
+  TextInput,
+  TouchableOpacity,
+  Platform,
+} from "react-native";
+import { useForm, Controller } from "react-hook-form";
+import { zodResolver } from "@hookform/resolvers/zod";
+import { z } from "zod";
+import { router } from "expo-router";
+import { SchemaRegister } from "../../schema/SchemaRegister";
 
+type SchemaRegisterType = z.infer<typeof SchemaRegister>;
 
+const Inscription = () => {
+  const {
+    control,
+    handleSubmit,
+    reset,
+    formState: { errors, isSubmitting },
+  } = useForm<SchemaRegisterType>({
+    defaultValues: {
+      email: "",
+      last_name: "",
+      first_name: "",
+    },
+    resolver: zodResolver(SchemaRegister),
+  });
 
+  const SubmitFormInscription = (data: SchemaRegisterType) => {
+    console.log("Données d'inscription:", data);
+    reset();
+   
+  };
 
-function RegisterPage() {
-    const [email, setEmail] = useState('');
-    const [firstName, setFirstName] = useState('');
-    const [lastName, setLastName] = useState('');
-    const router = useRouter();
+  // Styles responsive
+  const inputClass =
+    Platform.OS === "web"
+      ? "border border-gray-300 rounded-lg px-4 py-3 text-lg bg-gray-50 focus:border-blue-500 outline-none  placeholder:text-gray-400"
+      : "border border-gray-300 rounded-lg px-3 py-2 text-base bg-gray-50";
 
-    async function handleCreateUser() {
-        // TODO: do proper validation with zod or yup
-        if (!email || !firstName || !lastName) {
-            alert('invalide input all are required');
-            return;
+  const labelClass =
+    Platform.OS === "web"
+      ? "text-base font-medium text-gray-700 mb-1"
+      : "text-sm font-medium text-gray-700 mb-1";
+
+  return (
+    <View className="flex-1 bg-white p-6 mt-16 items-center ">
+      <View
+        style={
+          Platform.OS === "web"
+            ? { width: "50%", minWidth: 320, maxWidth: 500 }
+            : { width: "100%" }
         }
+        className="w-full"
+      >
+        <Text className="text-3xl font-bold text-center text-gray-800 mb-8">
+          Inscription
+        </Text>
 
-        console.log('handleCreateUser');
+        <View className="flex gap-4">
+          {/* Email */}
+          <View>
+            <Text className={labelClass}>Email</Text>
+            <Controller
+              control={control}
+              name="email"
+              render={({ field: { onChange, onBlur, value } }) => (
+                <TextInput
+                  className={inputClass}
+                  placeholder="votre@email.com"
+                  keyboardType="email-address"
+                  autoCapitalize="none"
+                  onChangeText={onChange}
+                  onBlur={onBlur}
+                  value={value}
+                  textContentType="emailAddress"
+                  autoCorrect={false}
+                />
+              )}
+            />
+            {errors.email && (
+              <Text className="text-red-500 text-md mt-1">
+                {errors.email.message}
+              </Text>
+            )}
+          </View>
 
-        try {
-            // TODO: à refaire avec tanstack query
-            const res = await api_client.post(`${api_configs.base_url}/auth/register`, {
-                first_name: firstName,
-                last_name: lastName,
-                email,
-            });
+          {/* Nom */}
+          <View>
+            <Text className={labelClass}>Nom</Text>
+            <Controller
+              control={control}
+              name="last_name"
+              render={({ field: { onChange, onBlur, value } }) => (
+                <TextInput
+                  className={inputClass}
+                  placeholder="Votre nom"
+                  onChangeText={onChange}
+                  onBlur={onBlur}
+                  value={value}
+                  autoCapitalize="words"
+                />
+              )}
+            />
+            {errors.last_name && (
+              <Text className="text-red-500 text-md mt-1">
+                {errors.last_name.message}
+              </Text>
+            )}
+          </View>
 
-            if (res.status == 200) {
-                router.push('/auth/request-code?email=' + email);
-                return;
-            }
+          {/* Prénom */}
+          <View>
+            <Text className={labelClass}>Prénom</Text>
+            <Controller
+              control={control}
+              name="first_name"
+              render={({ field: { onChange, onBlur, value } }) => (
+                <TextInput
+                  className={inputClass}
+                  placeholder="Votre prénom"
+                  onChangeText={onChange}
+                  onBlur={onBlur}
+                  value={value}
+                  autoCapitalize="words"
+                />
+              )}
+            />
+            {errors.first_name && (
+              <Text className="text-red-500 text-md mt-1">
+                {errors.first_name.message}
+              </Text>
+            )}
+          </View>
 
-            throw new Error(res.error)
+          {/* Bouton inscription */}
+          <TouchableOpacity
+            className={`${
+              isSubmitting ? "bg-blue-400" : "bg-blue-600"
+            } py-3 rounded-lg mt-4`}
+            onPress={handleSubmit(SubmitFormInscription)}
+            disabled={isSubmitting}
+          >
+            <Text className="text-white text-lg font-semibold text-center">
+              {isSubmitting ? "Inscription en cours..." : "S'inscrire"}
+            </Text>
+          </TouchableOpacity>
 
-        } catch (error: AxiosError|any) {
-            console.log(error);
-            // TODO: à affciher l'erreur correctement
-            
-            alert(error?.response?.data?.error)
-        }
-
-
-
-
-
-    }
-
-
-    return (
-        <View className="flex-1 justify-center items-center bg-gray-100 p-6">
-            <View className="bg-white rounded-xl shadow-lg p-8 w-full max-w-md">
-                <Text className="text-xl font-semibold mb-4 text-gray-800 text-center">Login</Text>
-                <View className="mb-4">
-                    <Text className="text-gray-700 mb-2">First Name*:</Text>
-                    <TextInput
-                        value={firstName}
-                        onChangeText={setFirstName}
-                        className="border border-gray-300 rounded-md py-3 px-2 text-gray-700 focus:outline-none focus:border-blue-500"
-                        placeholder="First Name"
-                        keyboardType="default"
-                    />
-                </View>
-
-                <View className="mb-4">
-                    <Text className="text-gray-700 mb-2">First Name*:</Text>
-                    <TextInput
-                        value={lastName}
-                        onChangeText={setLastName}
-                        className="border border-gray-300 rounded-md py-3 px-2 text-gray-700 focus:outline-none focus:border-blue-500"
-                        placeholder="First Name"
-                        keyboardType="default"
-                    />
-                </View>
-
-                <View className="mb-4">
-                    <Text className="text-gray-700 mb-2">Email*:</Text>
-                    <TextInput
-                        value={email}
-                        onChangeText={setEmail}
-                        className="border border-gray-300 rounded-md py-3 px-2 text-gray-700 focus:outline-none focus:border-blue-500"
-                        placeholder="Your email"
-                        keyboardType="email-address"
-                    />
-                </View>
-
-                <Pressable onPress={handleCreateUser} className="bg-blue-600 hover:bg-blue-700 active:bg-blue-700 rounded-md py-4">
-                    <Text className="text-white font-semibold text-center">Créer un compte</Text>
-                </Pressable>
-
-
-                <View className="flex flex-row justify-center mt-10">
-                    <Pressable onPress={() => router.push('/auth/login')}>
-                        <Text className="text-blue-400">login</Text>
-                    </Pressable>
-                </View>
-            </View>
+          {/* Lien vers connexion */}
+          <View className="flex-row justify-center mt-6">
+            <Text className="text-gray-600">Déjà un compte ?</Text>
+            <TouchableOpacity onPress={() => router.push("/auth/login")}>
+              <Text className="text-blue-600 font-medium ml-1">
+                Se connecter
+              </Text>
+            </TouchableOpacity>
+          </View>
         </View>
-    );
-}
+      </View>
+    </View>
+  );
+};
 
-export default RegisterPage;
+export default Inscription;
