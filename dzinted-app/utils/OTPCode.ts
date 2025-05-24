@@ -1,5 +1,5 @@
 interface OTPInfo {
-  code: number;
+  CodeOTP: number;
   expirationCode: Date;
 }
 

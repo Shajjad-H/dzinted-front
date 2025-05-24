@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useState } from "react";
 import {
   View,
   Text,
@@ -12,14 +12,18 @@ import { z } from "zod";
 import { router } from "expo-router";
 import { SchemaRegister } from "../../schema/SchemaRegister";
 import { OTPCode } from "../../utils/OTPCode";
+import FormOTP from "../../components/FormOTP/FormOTP";
 
 type SchemaRegisterType = z.infer<typeof SchemaRegister>;
 
-const code = OTPCode()
-
-console.log(code)
-
 const Inscription = () => {
+  const [showFormOTP, setShowFormOTP] = useState(false);
+  const [emailForOtp, setEmailForOtp] = useState("");
+
+  // Le code OTP et son expiration sont dans le state
+  const [otpCode, setOtpCode] = useState(() => OTPCode().CodeOTP);
+  const [otpExpiration, setOtpExpiration] = useState(() => OTPCode().expirationCode);
+
   const {
     control,
     handleSubmit,
@@ -30,15 +34,25 @@ const Inscription = () => {
       last_name: "",
       first_name: "",
       email: "",
-      emailconfirmation : ""
+      emailconfirmation: "",
     },
     resolver: zodResolver(SchemaRegister),
   });
 
+  // Génère un nouveau code OTP et met à jour le state
+  const handleResendOTP = () => {
+    const { CodeOTP, expirationCode } = OTPCode();
+    setOtpCode(CodeOTP);
+    setOtpExpiration(expirationCode);
+    console.log("Nouveau code OTP :", CodeOTP, "Expire à :", expirationCode);
+  };
+
   const SubmitFormInscription = (data: SchemaRegisterType) => {
-    console.log("Données d'inscription:", data);
+    // Génère un code OTP à chaque inscription
+    handleResendOTP();
     reset();
-   
+    setShowFormOTP(true);
+    setEmailForOtp(data.email);
   };
 
   // Styles responsive
@@ -51,6 +65,17 @@ const Inscription = () => {
     Platform.OS === "web"
       ? "text-base font-medium text-gray-700 mb-1"
       : "text-sm font-medium text-gray-700 mb-1";
+
+  if (showFormOTP) {
+    return (
+      <FormOTP
+        code={otpCode}
+        expiration={otpExpiration}
+        emailForOtp={emailForOtp}
+        onResendOTP={handleResendOTP}
+      />
+    );
+  }
 
   return (
     <View className="flex-1 bg-white p-6 mt-16 items-center ">
@@ -67,7 +92,6 @@ const Inscription = () => {
         </Text>
 
         <View className="flex gap-4">
-       
           {/* Prénom */}
           <View>
             <Text className={labelClass}>Prénom</Text>
@@ -92,7 +116,7 @@ const Inscription = () => {
             )}
           </View>
 
-            {/* Nom */}
+          {/* Nom */}
           <View>
             <Text className={labelClass}>Nom</Text>
             <Controller
@@ -116,7 +140,7 @@ const Inscription = () => {
             )}
           </View>
 
-             {/* Email */}
+          {/* Email */}
           <View>
             <Text className={labelClass}>Email</Text>
             <Controller
@@ -168,7 +192,7 @@ const Inscription = () => {
               </Text>
             )}
 
-             {errors.root?.message && (
+            {errors.root?.message && (
               <Text className="text-red-500 text-md mt-1">
                 {errors.root?.message}
               </Text>

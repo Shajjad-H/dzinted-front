@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useState } from "react";
 import {
   View,
   Text,
@@ -11,11 +11,21 @@ import { zodResolver } from "@hookform/resolvers/zod";
 import { z } from "zod";
 import { useRouter } from "expo-router";
 import { SchemaLogin } from "../../schema/SchemaLogin";
+import { OTPCode } from "../../utils/OTPCode";
+import FormOTP from "../../components/FormOTP/FormOTP";
 
 type SchemaLoginType = z.infer<typeof SchemaLogin>;
 
 const LoginPage = () => {
   const router = useRouter();
+
+  // State pour afficher le formulaire OTP
+  const [showFormOTP, setShowFormOTP] = useState(false);
+  const [emailForOtp, setEmailForOtp] = useState("");
+
+  // State pour le code OTP et son expiration
+  const [otpCode, setOtpCode] = useState(() => OTPCode().CodeOTP);
+  const [otpExpiration, setOtpExpiration] = useState(() => OTPCode().expirationCode);
 
   const {
     control,
@@ -29,10 +39,19 @@ const LoginPage = () => {
     resolver: zodResolver(SchemaLogin),
   });
 
+  // Génère un nouveau code OTP et met à jour le state
+  const handleResendOTP = () => {
+    const { CodeOTP, expirationCode } = OTPCode();
+    setOtpCode(CodeOTP);
+    setOtpExpiration(expirationCode);
+    console.log("Nouveau code OTP :", CodeOTP, "Expire à :", expirationCode);
+  };
+
   function handleRequestCode(data: SchemaLoginType) {
-    // TODO: call api
-    // router.push("/auth/request-code?email=" + data.email);
-    console.log(data);
+    // Génère un code OTP à chaque demande de connexion
+    handleResendOTP();
+    setShowFormOTP(true);
+    setEmailForOtp(data.email);
     reset();
   }
 
@@ -46,6 +65,17 @@ const LoginPage = () => {
     Platform.OS === "web"
       ? "text-base font-medium text-gray-700 mb-1"
       : "text-sm font-medium text-gray-700 mb-1";
+
+  if (showFormOTP) {
+    return (
+      <FormOTP
+        code={otpCode}
+        expiration={otpExpiration}
+        emailForOtp={emailForOtp}
+        onResendOTP={handleResendOTP}
+      />
+    );
+  }
 
   return (
     <View className="flex-1 bg-white p-6 mt-16 items-center">
