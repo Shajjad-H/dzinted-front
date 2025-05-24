@@ -11,8 +11,13 @@ import { zodResolver } from "@hookform/resolvers/zod";
 import { z } from "zod";
 import { router } from "expo-router";
 import { SchemaRegister } from "../../schema/SchemaRegister";
+import { OTPCode } from "../../utils/OTPCode";
 
 type SchemaRegisterType = z.infer<typeof SchemaRegister>;
+
+const code = OTPCode()
+
+console.log(code)
 
 const Inscription = () => {
   const {
@@ -22,9 +27,10 @@ const Inscription = () => {
     formState: { errors, isSubmitting },
   } = useForm<SchemaRegisterType>({
     defaultValues: {
-      email: "",
       last_name: "",
       first_name: "",
+      email: "",
+      emailconfirmation : ""
     },
     resolver: zodResolver(SchemaRegister),
   });
@@ -61,7 +67,56 @@ const Inscription = () => {
         </Text>
 
         <View className="flex gap-4">
-          {/* Email */}
+       
+          {/* Prénom */}
+          <View>
+            <Text className={labelClass}>Prénom</Text>
+            <Controller
+              control={control}
+              name="first_name"
+              render={({ field: { onChange, onBlur, value } }) => (
+                <TextInput
+                  className={inputClass}
+                  placeholder="Votre prénom"
+                  onChangeText={onChange}
+                  onBlur={onBlur}
+                  value={value}
+                  autoCapitalize="words"
+                />
+              )}
+            />
+            {errors.first_name && (
+              <Text className="text-red-500 text-md mt-1">
+                {errors.first_name.message}
+              </Text>
+            )}
+          </View>
+
+            {/* Nom */}
+          <View>
+            <Text className={labelClass}>Nom</Text>
+            <Controller
+              control={control}
+              name="last_name"
+              render={({ field: { onChange, onBlur, value } }) => (
+                <TextInput
+                  className={inputClass}
+                  placeholder="Votre nom"
+                  onChangeText={onChange}
+                  onBlur={onBlur}
+                  value={value}
+                  autoCapitalize="words"
+                />
+              )}
+            />
+            {errors.last_name && (
+              <Text className="text-red-500 text-md mt-1">
+                {errors.last_name.message}
+              </Text>
+            )}
+          </View>
+
+             {/* Email */}
           <View>
             <Text className={labelClass}>Email</Text>
             <Controller
@@ -88,50 +143,34 @@ const Inscription = () => {
             )}
           </View>
 
-          {/* Nom */}
           <View>
-            <Text className={labelClass}>Nom</Text>
+            <Text className={labelClass}>Confirmation Email</Text>
             <Controller
               control={control}
-              name="last_name"
+              name="emailconfirmation"
               render={({ field: { onChange, onBlur, value } }) => (
                 <TextInput
                   className={inputClass}
-                  placeholder="Votre nom"
+                  placeholder="votre@email.com"
+                  keyboardType="email-address"
+                  autoCapitalize="none"
                   onChangeText={onChange}
                   onBlur={onBlur}
                   value={value}
-                  autoCapitalize="words"
+                  textContentType="emailAddress"
+                  autoCorrect={false}
                 />
               )}
             />
-            {errors.last_name && (
+            {errors.emailconfirmation && (
               <Text className="text-red-500 text-md mt-1">
-                {errors.last_name.message}
+                {errors.emailconfirmation.message}
               </Text>
             )}
-          </View>
 
-          {/* Prénom */}
-          <View>
-            <Text className={labelClass}>Prénom</Text>
-            <Controller
-              control={control}
-              name="first_name"
-              render={({ field: { onChange, onBlur, value } }) => (
-                <TextInput
-                  className={inputClass}
-                  placeholder="Votre prénom"
-                  onChangeText={onChange}
-                  onBlur={onBlur}
-                  value={value}
-                  autoCapitalize="words"
-                />
-              )}
-            />
-            {errors.first_name && (
+             {errors.root?.message && (
               <Text className="text-red-500 text-md mt-1">
-                {errors.first_name.message}
+                {errors.root?.message}
               </Text>
             )}
           </View>
